@@ -1,7 +1,6 @@
 #include <QString>
 #include <QApplication>
 #include <QDebug>
-#include <QScreen>
 #include "QtAndroid"
 #include <QtAndroidExtras>
 #include <QAndroidJniObject>
@@ -31,8 +30,10 @@ public:
     }
     ~Qtarootshell();
 
-
     // =======================
+
+    void init_process();
+    void init_process2();
 
     static QPair<int,QPair<QString,QString>> executeRootCommand(const QString &command) {
         QPair<int,QPair<QString,QString>> result;
@@ -63,7 +64,12 @@ public:
             return result;
         }
         process->write(command.toUtf8() + "\n");
-        if (!process->waitForReadyRead()) {
+
+        process->waitForReadyRead();
+        while (process->waitForReadyRead()){
+            result.second += process->readAllStandardOutput();
+        }
+        if (!process->waitForReadyRead() && result.second.count()==0) {
             result.second = "No output from command";
             return result;
         }
@@ -72,17 +78,25 @@ public:
         return result;
     }
 
+    bool executeCommandAsync(const QString &command) {
+        if (process2->state() != QProcess::Running) {
+            return false;
+        }
+        process2->write(command.toUtf8() + "\n");
+        return true;
+    }
 
     // =======================
 
 
 private:
     Qtarootshell();
-    QProcess *process;
+    QProcess *process = nullptr;
+    QProcess *process2 = nullptr;
 
 signals:
-
-
+    void process2_readyReadStandardOutput(const QString &s);
+    void process2_readyReadStandardError(const QString &s);
 };
 
 #endif
