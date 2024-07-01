@@ -4,22 +4,7 @@
 
 Qtarootshell *qtarootshell_instance = nullptr;
 Qtarootshell::~Qtarootshell(){
-    if (process){
-        process->write("exit\n");
-        process->waitForFinished(5);
-        process->terminate();
-        process->kill();
-        delete process;
-        process = nullptr;
-    }
-    if(process2){
-        process2->write("exit\n");
-        process2->waitForFinished(5);
-        process2->terminate();
-        process2->kill();
-        delete process2;
-        process2 = nullptr;
-    }
+    close();
 }
 Qtarootshell::Qtarootshell() : QObject(){
     init_process();
@@ -61,6 +46,25 @@ void Qtarootshell::init_process2(){
     process2->start("su");
     if (!process2->waitForStarted()) {
         qDebug() << "Failed to start root shell2";
+    }
+}
+
+void Qtarootshell::close(){
+    if (process){
+        process->write("exit\n");
+        process->waitForFinished(5);
+        process->terminate();
+        process->kill();
+        delete process;
+        process = nullptr;
+    }
+    if(process2){
+        process2->write("exit\n");
+        process2->waitForFinished(5);
+        process2->terminate();
+        process2->kill();
+        delete process2;
+        process2 = nullptr;
     }
 }
 

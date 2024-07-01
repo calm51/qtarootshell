@@ -34,6 +34,7 @@ public:
 
     void init_process();
     void init_process2();
+    void close();
 
     static QPair<int,QPair<QString,QString>> executeRootCommand(const QString &command) {
         QPair<int,QPair<QString,QString>> result;
